@@ -261,38 +261,42 @@ export default function Component() {
                         filteredTasks
                           .filter((task) => !task.done)
                           .map((task, index) => (
-                            <Draggable key={task.id} draggableId={task.id} index={index}>
-                              {(provided) => (
-                                <motion.div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  initial={{ opacity: 0, y: -10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  exit={{ opacity: 0, y: -10 }}
-                                  className={`flex items-center space-x-3 mb-3 p-3 rounded-xl ${currentTheme.taskBackground} transition-colors duration-300`}
-                                >
-                                  <motion.button
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => toggleTaskStatus(task.id)}
-                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${currentTheme.accent} border-gray-300`}
-                                  />
-                                  <span className="flex-grow">
-                                    {task.text}
-                                    {task.tags.map((tag, index) => (
-                                      <span key={index} className={`ml-2 text-xs ${currentTheme.accent} bg-opacity-20 px-2 py-1 rounded-full`}>#{tag}</span>
-                                    ))}
-                                  </span>
-                                  <motion.button
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => deleteTask(task.id)}
-                                    className="text-red-500 hover:text-red-600 transition-colors duration-300"
-                                  >
-                                    ×
-                                  </motion.button>
-                                </motion.div>
-                              )}
-                            </Draggable>
+                      <Draggable key={task.id} draggableId={task.id} index={index}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                          >
+                            <motion.div
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -10 }}
+                              className={`flex items-center space-x-3 mb-3 p-3 rounded-xl ${currentTheme.taskBackground} transition-colors duration-300`}
+                            >
+                              <motion.button
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => toggleTaskStatus(task.id)}
+                                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${currentTheme.accent} border-gray-300`}
+                              />
+                              <span className="flex-grow">
+                                {task.text}
+                                {task.tags.map((tag, index) => (
+                                  <span key={index} className={`ml-2 text-xs ${currentTheme.accent} bg-opacity-20 px-2 py-1 rounded-full`}>#{tag}</span>
+                                ))}
+                              </span>
+                              <motion.button
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => deleteTask(task.id)}
+                                className="text-red-500 hover:text-red-600 transition-colors duration-300"
+                              >
+                                ×
+                              </motion.button>
+                            </motion.div>
+                          </div>
+                        )}
+                      </Draggable>
+
                           ))
                       ) : (
                         <p className="text-gray-500 italic">You have no tasks to do. Time to relax!</p>
