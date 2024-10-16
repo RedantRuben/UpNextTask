@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, ChevronLeft, ChevronRight, Plus, Settings, Moon, Sun, Timer, Trophy } from "lucide-react" // Added Trophy icon
+import { Check, ChevronLeft, ChevronRight, Plus, Settings, Moon, Sun, Timer, Trophy } from "lucide-react" // Trophy icon
 import confetti from 'canvas-confetti'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 
@@ -58,7 +58,7 @@ const themes: Theme[] = [
   { name: "Gold", background: "bg-yellow-200", cardBackground: "bg-yellow-100", taskBackground: "bg-yellow-300", text: "text-yellow-900", accent: "bg-yellow-600" },
 ]
 
-// Predefined Achievements
+// Predefined Achievements (Removed "streak_5")
 const achievements: Achievement[] = [
   {
     id: "first_task",
@@ -72,16 +72,10 @@ const achievements: Achievement[] = [
     description: "Complete 5 tasks.",
     icon: <Trophy size={20} className="text-green-500" />,
   },
-  {
-    id: "streak_5",
-    name: "5-Day Streak",
-    description: "Maintain a streak of 5 days.",
-    icon: <Trophy size={20} className="text-blue-500" />,
-  },
   // Add more achievements as needed
 ]
 
-export default function Component() {
+export default function App() {
   // Existing States
   const [tasks, setTasks] = useState<Task[]>([])
   const [newTask, setNewTask] = useState("")
@@ -90,8 +84,7 @@ export default function Component() {
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[1]) // Start with Dark theme
   const [pomodoroTime, setPomodoroTime] = useState(25 * 60)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [streak, setStreak] = useState(0)
-  
+
   // New State for Achievements
   const [earnedAchievements, setEarnedAchievements] = useState<string[]>([])
 
@@ -100,10 +93,6 @@ export default function Component() {
     const storedTasks = localStorage.getItem("tasks")
     if (storedTasks) {
       setTasks(JSON.parse(storedTasks))
-    }
-    const storedStreak = localStorage.getItem("streak")
-    if (storedStreak) {
-      setStreak(parseInt(storedStreak))
     }
     const storedTheme = localStorage.getItem("theme")
     if (storedTheme) {
@@ -119,10 +108,6 @@ export default function Component() {
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks))
   }, [tasks])
-
-  useEffect(() => {
-    localStorage.setItem("streak", streak.toString())
-  }, [streak])
 
   useEffect(() => {
     localStorage.setItem("theme", JSON.stringify(currentTheme))
@@ -145,17 +130,12 @@ export default function Component() {
       awardAchievement("five_tasks")
     }
 
-    // Check for 5-Day Streak Achievement
-    if (streak >= 5 && !earnedAchievements.includes("streak_5")) {
-      awardAchievement("streak_5")
-    }
-
     // Add more achievement checks as needed
-  }, [tasks, streak, earnedAchievements])
+  }, [tasks, earnedAchievements])
 
   const awardAchievement = (achievementId: string) => {
     setEarnedAchievements([...earnedAchievements, achievementId])
-    // Optional: Trigger confetti or other visual effects
+    // Trigger confetti or other visual effects
     confetti({
       particleCount: 100,
       spread: 70,
@@ -186,14 +166,11 @@ export default function Component() {
       if (task.id === id) {
         const newDoneStatus = !task.done
         if (newDoneStatus) {
-          setStreak(streak + 1)
           confetti({
             particleCount: 100,
             spread: 70,
             origin: { y: 0.6 }
           })
-        } else {
-          setStreak(Math.max(0, streak - 1))
         }
         return { ...task, done: newDoneStatus }
       }
@@ -327,10 +304,6 @@ export default function Component() {
               {/* Timer Display */}
               <div className="text-center font-mono text-xl sm:text-2xl mb-2">
                 {formatTime(pomodoroTime)}
-              </div>
-              {/* Streak Display */}
-              <div className="text-center text-sm sm:text-base">
-                Current streak: {streak} {streak === 1 ? 'day' : 'days'}
               </div>
               {/* Achievements Section */}
               <div className="mt-4 sm:mt-6">
