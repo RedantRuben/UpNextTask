@@ -155,11 +155,11 @@ export default function Component() {
   const completedTasks = filteredTasks.filter((task) => task.done).length
 
   return (
-    <div className={`min-h-screen ${currentTheme.background} ${currentTheme.text} p-8 flex justify-center items-start transition-colors duration-300`}>
+    <div className={`min-h-screen ${currentTheme.background} ${currentTheme.text} p-8 flex flex-col justify-between items-center transition-colors duration-300`}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`${currentTheme.cardBackground} rounded-3xl shadow-xl p-8 w-full max-w-md transition-colors duration-300`}
+        className={`${currentTheme.cardBackground} rounded-3xl shadow-xl p-8 w-full max-w-md transition-colors duration-300 flex-grow`}
       >
         <div className="flex justify-between items-center mb-8">
           <motion.h1 className="text-4xl font-bold" layout>
@@ -261,42 +261,41 @@ export default function Component() {
                         filteredTasks
                           .filter((task) => !task.done)
                           .map((task, index) => (
-                      <Draggable key={task.id} draggableId={task.id} index={index}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                          >
-                            <motion.div
-                              initial={{ opacity: 0, y: -10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -10 }}
-                              className={`flex items-center space-x-3 mb-3 p-3 rounded-xl ${currentTheme.taskBackground} transition-colors duration-300`}
-                            >
-                              <motion.button
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => toggleTaskStatus(task.id)}
-                                className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${currentTheme.accent} border-gray-300`}
-                              />
-                              <span className="flex-grow">
-                                {task.text}
-                                {task.tags.map((tag, index) => (
-                                  <span key={index} className={`ml-2 text-xs ${currentTheme.accent} bg-opacity-20 px-2 py-1 rounded-full`}>#{tag}</span>
-                                ))}
-                              </span>
-                              <motion.button
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => deleteTask(task.id)}
-                                className="text-red-500 hover:text-red-600 transition-colors duration-300"
-                              >
-                                ×
-                              </motion.button>
-                            </motion.div>
-                          </div>
-                        )}
-                      </Draggable>
-
+                            <Draggable key={task.id} draggableId={task.id} index={index}>
+                              {(provided) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                >
+                                  <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className={`flex items-center space-x-3 mb-3 p-3 rounded-xl ${currentTheme.taskBackground} transition-colors duration-300`}
+                                  >
+                                    <motion.button
+                                      whileTap={{ scale: 0.95 }}
+                                      onClick={() => toggleTaskStatus(task.id)}
+                                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${currentTheme.accent} border-gray-300`}
+                                    />
+                                    <span className="flex-grow">
+                                      {task.text}
+                                      {task.tags.map((tag, index) => (
+                                        <span key={index} className={`ml-2 text-xs ${currentTheme.accent} bg-opacity-20 px-2 py-1 rounded-full`}>#{tag}</span>
+                                      ))}
+                                    </span>
+                                    <motion.button
+                                      whileTap={{ scale: 0.95 }}
+                                      onClick={() => deleteTask(task.id)}
+                                      className="text-red-500 hover:text-red-600 transition-colors duration-300"
+                                    >
+                                      ×
+                                    </motion.button>
+                                  </motion.div>
+                                </div>
+                              )}
+                            </Draggable>
                           ))
                       ) : (
                         <p className="text-gray-500 italic">You have no tasks to do. Time to relax!</p>
@@ -382,6 +381,18 @@ export default function Component() {
           </div>
         </div>
       </motion.div>
+      {/* Footer */}
+      <footer className="mt-8 text-center text-sm text-gray-500">
+        © {new Date().getFullYear()} Developed by{" "}
+        <a
+          href="https://rubenredant.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:underline"
+        >
+          Ruben Redant
+        </a>
+      </footer>
     </div>
   )
 }
