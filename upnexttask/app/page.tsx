@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, ChevronLeft, ChevronRight, Plus, Settings, Moon, Sun, Timer } from "lucide-react"
+import { Check, ChevronLeft, ChevronRight, Plus, Settings, Moon, Sun, Timer, Trophy } from "lucide-react" // Added Trophy icon
 import confetti from 'canvas-confetti'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 
+// Task Interface
 interface Task {
   id: string
   text: string
@@ -15,6 +16,7 @@ interface Task {
   tags: string[]
 }
 
+// Theme Interface
 interface Theme {
   name: string
   background: string
@@ -24,6 +26,15 @@ interface Theme {
   accent: string
 }
 
+// Achievement Interface
+interface Achievement {
+  id: string
+  name: string
+  description: string
+  icon?: JSX.Element
+}
+
+// Predefined Themes
 const themes: Theme[] = [
   { name: "Light", background: "bg-gray-100", cardBackground: "bg-white", taskBackground: "bg-gray-50", text: "text-gray-900", accent: "bg-blue-600" },
   { name: "Dark", background: "bg-gray-900", cardBackground: "bg-gray-800", taskBackground: "bg-gray-700", text: "text-white", accent: "bg-blue-500" },
@@ -47,7 +58,31 @@ const themes: Theme[] = [
   { name: "Gold", background: "bg-yellow-200", cardBackground: "bg-yellow-100", taskBackground: "bg-yellow-300", text: "text-yellow-900", accent: "bg-yellow-600" },
 ]
 
+// Predefined Achievements
+const achievements: Achievement[] = [
+  {
+    id: "first_task",
+    name: "First Task",
+    description: "Complete your first task.",
+    icon: <Trophy size={20} className="text-yellow-500" />,
+  },
+  {
+    id: "five_tasks",
+    name: "Task Master",
+    description: "Complete 5 tasks.",
+    icon: <Trophy size={20} className="text-green-500" />,
+  },
+  {
+    id: "streak_5",
+    name: "5-Day Streak",
+    description: "Maintain a streak of 5 days.",
+    icon: <Trophy size={20} className="text-blue-500" />,
+  },
+  // Add more achievements as needed
+]
+
 export default function Component() {
+  // Existing States
   const [tasks, setTasks] = useState<Task[]>([])
   const [newTask, setNewTask] = useState("")
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -56,7 +91,11 @@ export default function Component() {
   const [pomodoroTime, setPomodoroTime] = useState(25 * 60)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [streak, setStreak] = useState(0)
+  
+  // New State for Achievements
+  const [earnedAchievements, setEarnedAchievements] = useState<string[]>([])
 
+  // Load data from localStorage
   useEffect(() => {
     const storedTasks = localStorage.getItem("tasks")
     if (storedTasks) {
@@ -70,8 +109,13 @@ export default function Component() {
     if (storedTheme) {
       setCurrentTheme(JSON.parse(storedTheme))
     }
+    const storedAchievements = localStorage.getItem("achievements")
+    if (storedAchievements) {
+      setEarnedAchievements(JSON.parse(storedAchievements))
+    }
   }, [])
 
+  // Save data to localStorage
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(tasks))
   }, [tasks])
@@ -84,6 +128,42 @@ export default function Component() {
     localStorage.setItem("theme", JSON.stringify(currentTheme))
   }, [currentTheme])
 
+  useEffect(() => {
+    localStorage.setItem("achievements", JSON.stringify(earnedAchievements))
+  }, [earnedAchievements])
+
+  // Achievement Awarding Logic
+  useEffect(() => {
+    // Check for First Task Achievement
+    if (tasks.length >= 1 && !earnedAchievements.includes("first_task")) {
+      awardAchievement("first_task")
+    }
+
+    // Check for Task Master Achievement
+    const completedTasks = tasks.filter(task => task.done).length
+    if (completedTasks >= 5 && !earnedAchievements.includes("five_tasks")) {
+      awardAchievement("five_tasks")
+    }
+
+    // Check for 5-Day Streak Achievement
+    if (streak >= 5 && !earnedAchievements.includes("streak_5")) {
+      awardAchievement("streak_5")
+    }
+
+    // Add more achievement checks as needed
+  }, [tasks, streak, earnedAchievements])
+
+  const awardAchievement = (achievementId: string) => {
+    setEarnedAchievements([...earnedAchievements, achievementId])
+    // Optional: Trigger confetti or other visual effects
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    })
+  }
+
+  // Existing Functions
   const addTask = (e: React.FormEvent) => {
     e.preventDefault()
     if (newTask.trim()) {
@@ -176,6 +256,7 @@ export default function Component() {
         animate={{ opacity: 1, y: 0 }}
         className={`${currentTheme.cardBackground} rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-md transition-colors duration-300 flex-grow`}
       >
+        {/* Header */}
         <div className="flex justify-between items-center mb-6 sm:mb-8">
           <motion.h1 className="text-3xl sm:text-4xl font-bold" layout>
             {currentDate.getDate()}{" "}
@@ -204,6 +285,8 @@ export default function Component() {
             </motion.button>
           </div>
         </div>
+
+        {/* Settings Modal */}
         <AnimatePresence>
           {showSettings && (
             <motion.div
@@ -213,6 +296,7 @@ export default function Component() {
               className={`mb-4 sm:mb-6 p-4 sm:p-6 ${currentTheme.cardBackground} rounded-2xl shadow-inner transition-colors duration-300 overflow-auto max-h-80`}
             >
               <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">Settings</h2>
+              {/* Theme Selection */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4">
                 <span className="mb-2 sm:mb-0">Theme</span>
                 <div className="flex flex-wrap gap-1 sm:gap-2 max-h-40 overflow-y-auto">
@@ -228,6 +312,7 @@ export default function Component() {
                   ))}
                 </div>
               </div>
+              {/* Pomodoro Timer */}
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <span>Pomodoro Timer</span>
                 <button
@@ -239,15 +324,34 @@ export default function Component() {
                   <Timer size={18} />
                 </button>
               </div>
+              {/* Timer Display */}
               <div className="text-center font-mono text-xl sm:text-2xl mb-2">
                 {formatTime(pomodoroTime)}
               </div>
+              {/* Streak Display */}
               <div className="text-center text-sm sm:text-base">
                 Current streak: {streak} {streak === 1 ? 'day' : 'days'}
+              </div>
+              {/* Achievements Section */}
+              <div className="mt-4 sm:mt-6">
+                <h3 className="text-md sm:text-lg font-semibold mb-2">Achievements</h3>
+                <div className="flex flex-wrap gap-2">
+                  {achievements.map((achievement) => (
+                    <div key={achievement.id} className={`flex items-center space-x-1 sm:space-x-2 p-2 sm:p-3 rounded-md ${earnedAchievements.includes(achievement.id) ? 'bg-green-100' : 'bg-gray-200'} transition-colors duration-300`}>
+                      {achievement.icon}
+                      <div>
+                        <p className="text-sm sm:text-base font-medium">{achievement.name}</p>
+                        <p className="text-xs sm:text-sm">{achievement.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Add Task Form */}
         <form onSubmit={addTask} className="mb-4 sm:mb-6">
           <label htmlFor="new-task" className="block text-sm sm:text-base font-medium mb-1 sm:mb-2">New Task</label>
           <div className="flex flex-col sm:flex-row items-stretch">
@@ -268,8 +372,11 @@ export default function Component() {
             </button>
           </div>
         </form>
+
+        {/* Task List */}
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="space-y-4 sm:space-y-6">
+            {/* Pending Tasks */}
             <div>
               <h2 className="text-lg sm:text-xl font-semibold capitalize mb-3 sm:mb-4">Tasks</h2>
               <Droppable droppableId="tasks">
@@ -319,7 +426,7 @@ export default function Component() {
                             </Draggable>
                           ))
                       ) : (
-                        <p className="text-gray-500 italic text-sm sm:text-base">You have no tasks to do. Time to relax!</p>
+                        <p className="text-gray-500 italic text-sm sm:text-base">You haven&#39;t finished any tasks yet. Keep going!</p>
                       )}
                     </AnimatePresence>
                     {provided.placeholder}
@@ -327,6 +434,8 @@ export default function Component() {
                 )}
               </Droppable>
             </div>
+
+            {/* Completed Tasks */}
             <div>
               <h2 className="text-lg sm:text-xl font-semibold capitalize mb-2 sm:mb-3">Done</h2>
               <p className="mb-2 text-gray-500 text-sm sm:text-base">{completedTasks} task{completedTasks !== 1 ? 's' : ''} completed</p>
@@ -367,12 +476,14 @@ export default function Component() {
                       </motion.div>
                     ))
                 ) : (
-                  <p className="text-gray-500 italic text-sm sm:text-base">You haven't finished any tasks yet. Keep going!</p>
+                  <p className="text-gray-500 italic text-sm sm:text-base">You haven&#39;t finished any tasks yet. Keep going!</p>
                 )}
               </AnimatePresence>
             </div>
           </div>
         </DragDropContext>
+
+        {/* Footer Section within Card */}
         <div className="mt-6 sm:mt-8 flex justify-between items-center">
           <span className="text-xs sm:text-sm text-gray-500">
             {remainingTasks === 0
@@ -407,7 +518,8 @@ export default function Component() {
           </div>
         </div>
       </motion.div>
-      {/* Footer */}
+
+      {/* Footer Outside Card */}
       <footer className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-500">
         © {new Date().getFullYear()} Developed by{" "}
         <a
