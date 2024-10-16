@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { motion, AnimatePresence, Reorder } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { Check, ChevronLeft, ChevronRight, Plus, Settings, Moon, Sun, Timer } from "lucide-react"
 import confetti from 'canvas-confetti'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 
 interface Task {
   id: string
@@ -140,7 +140,7 @@ export default function Component() {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
   }
 
-  const onDragEnd = (result: any) => {
+  const onDragEnd = (result: DropResult) => {
     if (!result.destination) return
 
     const newTasks = Array.from(tasks)
@@ -305,6 +305,7 @@ export default function Component() {
             </div>
             <div>
               <h2 className="text-xl font-semibold capitalize mb-4">Done</h2>
+              <p className="mb-2 text-gray-500">{completedTasks} task{completedTasks !== 1 ? 's' : ''} completed</p>
               <AnimatePresence>
                 {filteredTasks.filter((task) => task.done).length > 0 ? (
                   filteredTasks
@@ -314,13 +315,12 @@ export default function Component() {
                         key={task.id}
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10  }}
+                        exit={{ opacity: 0, y: -10 }}
                         className={`flex items-center space-x-3 mb-3 p-3 rounded-xl ${currentTheme.taskBackground} transition-colors duration-300`}
                       >
                         <motion.button
                           whileTap={{ scale: 0.95 }}
                           onClick={() => toggleTaskStatus(task.id)}
-                
                           className={`w-6 h-6 rounded-full border-2 flex items-center justify-center bg-green-500 border-green-500`}
                         >
                           <Check size={14} className="text-white" />
@@ -341,7 +341,7 @@ export default function Component() {
                       </motion.div>
                     ))
                 ) : (
-                  <p className="text-gray-500 italic">You haven't finished any tasks yet. Keep going!</p>
+                  <p className="text-gray-500 italic">You haven&apos;t finished any tasks yet. Keep going!</p>
                 )}
               </AnimatePresence>
             </div>
