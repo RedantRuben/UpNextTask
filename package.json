@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "canvas-confetti": "^1.9.3",
+    "framer-motion": "^11.11.9",
+    "lucide-react": "^0.453.0",
+    "react-beautiful-dnd": "^13.1.1"
+  }
+}
