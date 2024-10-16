@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Check, ChevronLeft, ChevronRight, Plus, Settings, Moon, Sun, Timer, Trophy } from "lucide-react" // Trophy icon
+import { Check, ChevronLeft, ChevronRight, Plus, Settings, Moon, Sun, Timer } from "lucide-react"
 import confetti from 'canvas-confetti'
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd'
 
@@ -24,14 +24,6 @@ interface Theme {
   taskBackground: string
   text: string
   accent: string
-}
-
-// Achievement Interface
-interface Achievement {
-  id: string
-  name: string
-  description: string
-  icon?: JSX.Element
 }
 
 // Predefined Themes
@@ -58,23 +50,6 @@ const themes: Theme[] = [
   { name: "Gold", background: "bg-yellow-200", cardBackground: "bg-yellow-100", taskBackground: "bg-yellow-300", text: "text-yellow-900", accent: "bg-yellow-600" },
 ]
 
-// Predefined Achievements (Removed "streak_5")
-const achievements: Achievement[] = [
-  {
-    id: "first_task",
-    name: "First Task",
-    description: "Complete your first task.",
-    icon: <Trophy size={20} className="text-yellow-500" />,
-  },
-  {
-    id: "five_tasks",
-    name: "Task Master",
-    description: "Complete 5 tasks.",
-    icon: <Trophy size={20} className="text-green-500" />,
-  },
-  // Add more achievements as needed
-]
-
 export default function App() {
   // Existing States
   const [tasks, setTasks] = useState<Task[]>([])
@@ -84,9 +59,6 @@ export default function App() {
   const [currentTheme, setCurrentTheme] = useState<Theme>(themes[1]) // Start with Dark theme
   const [pomodoroTime, setPomodoroTime] = useState(25 * 60)
   const [isTimerRunning, setIsTimerRunning] = useState(false)
-
-  // New State for Achievements
-  const [earnedAchievements, setEarnedAchievements] = useState<string[]>([])
 
   // Load data from localStorage
   useEffect(() => {
@@ -98,10 +70,6 @@ export default function App() {
     if (storedTheme) {
       setCurrentTheme(JSON.parse(storedTheme))
     }
-    const storedAchievements = localStorage.getItem("achievements")
-    if (storedAchievements) {
-      setEarnedAchievements(JSON.parse(storedAchievements))
-    }
   }, [])
 
   // Save data to localStorage
@@ -112,36 +80,6 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("theme", JSON.stringify(currentTheme))
   }, [currentTheme])
-
-  useEffect(() => {
-    localStorage.setItem("achievements", JSON.stringify(earnedAchievements))
-  }, [earnedAchievements])
-
-  // Achievement Awarding Logic
-  useEffect(() => {
-    // Check for First Task Achievement
-    if (tasks.length >= 1 && !earnedAchievements.includes("first_task")) {
-      awardAchievement("first_task")
-    }
-
-    // Check for Task Master Achievement
-    const completedTasks = tasks.filter(task => task.done).length
-    if (completedTasks >= 5 && !earnedAchievements.includes("five_tasks")) {
-      awardAchievement("five_tasks")
-    }
-
-    // Add more achievement checks as needed
-  }, [tasks, earnedAchievements])
-
-  const awardAchievement = (achievementId: string) => {
-    setEarnedAchievements([...earnedAchievements, achievementId])
-    // Trigger confetti or other visual effects
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    })
-  }
 
   // Existing Functions
   const addTask = (e: React.FormEvent) => {
@@ -304,21 +242,6 @@ export default function App() {
               {/* Timer Display */}
               <div className="text-center font-mono text-xl sm:text-2xl mb-2">
                 {formatTime(pomodoroTime)}
-              </div>
-              {/* Achievements Section */}
-              <div className="mt-4 sm:mt-6">
-                <h3 className="text-md sm:text-lg font-semibold mb-2">Achievements</h3>
-                <div className="flex flex-wrap gap-2">
-                  {achievements.map((achievement) => (
-                    <div key={achievement.id} className={`flex items-center space-x-1 sm:space-x-2 p-2 sm:p-3 rounded-md ${earnedAchievements.includes(achievement.id) ? 'bg-green-100' : 'bg-gray-200'} transition-colors duration-300`}>
-                      {achievement.icon}
-                      <div>
-                        <p className="text-sm sm:text-base font-medium">{achievement.name}</p>
-                        <p className="text-xs sm:text-sm">{achievement.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </motion.div>
           )}
